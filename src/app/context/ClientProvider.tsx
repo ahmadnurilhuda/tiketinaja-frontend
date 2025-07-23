@@ -1,17 +1,21 @@
 "use client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { Session } from "next-auth";
+import { SessionProvider } from "next-auth/react";
 import React from "react";
 import { ToastContainer } from "react-toastify";
 
 export interface ClientProviderProps {
   children: React.ReactNode;
+  session: Session | null;
 }
 
-function ClientProvider({ children }: ClientProviderProps) {
+function ClientProvider({ children, session }: ClientProviderProps) {
   const queryClient = new QueryClient();
   return (
     <>
+    <SessionProvider session={session}>
       <QueryClientProvider client={queryClient}>
         <ToastContainer
           position="top-center" 
@@ -28,6 +32,7 @@ function ClientProvider({ children }: ClientProviderProps) {
         {children}
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
+    </SessionProvider>
     </>
   );
 }

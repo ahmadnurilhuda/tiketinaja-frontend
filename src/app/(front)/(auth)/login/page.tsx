@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import React from 'react'
+import LoginPage from './LoginPage';
 
 
 export const metadata: Metadata = {
@@ -8,7 +9,9 @@ export const metadata: Metadata = {
 };
 function page() {
   return (
-    <div>page</div>
+    <>
+      <LoginPage />
+    </>
   )
 }
 

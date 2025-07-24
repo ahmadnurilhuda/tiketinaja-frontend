@@ -7,26 +7,43 @@ import {
   MenuItems,
   Transition,
 } from "@headlessui/react";
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronDown, UserCircle2 } from "lucide-react";
+import repository from "@/app/config/AxiosClientConfig";
 
 function NavbarFront() {
   const { data: session } = useSession();
+  const [isOrganizer, setIsOrganizer] = useState<boolean | null>(null);
 
   const pages = [{ name: "My Orders", href: "/orders" }];
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        if (session?.accessToken && isOrganizer === null) {
+          const response = await repository.get("/auth/profile");
+          if (response.status !== 200) {
+            throw new Error(response.data.message);
+          }
+          setIsOrganizer(response.data.data.organizer);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchProfile();
+  }, [session, isOrganizer]);
 
   return (
     <header className="bg-blue-600 shadow-lg sticky top-0 z-50">
       <nav className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8">
-        {/* Logo Aplikasi */}
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-1.5 p-1.5 text-xl font-bold text-white">
-            Tiketin
+            TiketinAja
           </Link>
         </div>
-
-        {/* Bagian Kanan */}
         <div className="flex items-center gap-x-4">
           {session?.user ? (
             <Menu as="div" className="relative inline-block text-left">
@@ -59,7 +76,6 @@ function NavbarFront() {
                       </p>
                     </div>
                     {pages.map((page) => (
-                      // Kode sudah diperbarui
                       <MenuItem key={page.name}>
                         <Link
                           href={page.href}
@@ -70,8 +86,7 @@ function NavbarFront() {
                       </MenuItem>
                     ))}
 
-                    {!session.user.organizer && (
-                      // Kode sudah diperbarui
+                    {isOrganizer === false ? (
                       <MenuItem>
                         <Link
                           href="/join-organizer"
@@ -80,9 +95,16 @@ function NavbarFront() {
                           Join Organizer
                         </Link>
                       </MenuItem>
+                    ) : (
+                      <MenuItem>
+                        <Link
+                          href="/organizer"
+                          className="block w-full px-4 py-2 text-left text-sm font-semibold text-blue-600 ui-active:bg-gray-100 ui-active:text-blue-700"
+                        >
+                          Organizer
+                        </Link>
+                      </MenuItem>
                     )}
-
-                    {/* Kode sudah diperbarui */}
                     <MenuItem>
                       <button
                         onClick={() => signOut({ callbackUrl: "/" })}

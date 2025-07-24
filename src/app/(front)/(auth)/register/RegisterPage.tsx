@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
 import { User, Mail, Lock, Smartphone, UserSquare, Ticket } from "lucide-react";
 import { toast } from "react-toastify";
@@ -33,13 +33,10 @@ function RegisterPage() {
     phoneNumber: "",
   };
 
-  const handleRegister = async (values: {
-    fullName: string;
-    nickName: string;
-    email: string;
-    password: string;
-    phoneNumber: string;
-  }) => {
+  const handleRegister = async (
+    values: typeof initialValues,
+    formikHelpers: FormikHelpers<typeof initialValues>
+  ) => {
     if (
       !values.fullName ||
       !values.nickName ||
@@ -72,6 +69,7 @@ function RegisterPage() {
       toast.success(
         `${data.message} please check your email for verification link`
       );
+      formikHelpers.resetForm();
     } catch (error) {
       console.error(error);
       toast.error((error as Error).message);
@@ -96,7 +94,9 @@ function RegisterPage() {
             <Formik
               initialValues={initialValues}
               validationSchema={validationSchema}
-              onSubmit={handleRegister}
+              onSubmit={async (values, formikHelpers) => {
+                await handleRegister(values, formikHelpers);
+              }}
             >
               {({ isSubmitting, errors, touched }) => (
                 <Form className="space-y-4 md:space-y-6">

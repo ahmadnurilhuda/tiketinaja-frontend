@@ -1,13 +1,16 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Mail, Lock, Ticket } from "lucide-react";
 import { toast } from "react-toastify";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
+import {useRouter } from "next/navigation";
 
 function LoginPage() {
+  const [callbackUrl, setCallbackUrl] = useState<string | null>(null);
+  const router = useRouter();
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .trim()
@@ -28,24 +31,36 @@ function LoginPage() {
     }
     try {
       const response = await signIn("credentials", {
-      email: values.email,
-      password: values.password,
-      redirect: false,
-    });
-    console.log(response);
+        email: values.email,
+        password: values.password,
+        redirect: false,
+      });
+      console.log(response);
 
-    if(!response?.ok) {
-      throw new Error(response?.error ?? "Login failed");
-    }
-    if(response?.status === 200) {
-      toast.success("Login successful");
-    }
-      
+      if (!response?.ok) {
+        throw new Error(response?.error ?? "Login failed");
+      }
+      if (response?.status === 200) {
+        toast.success("Login successful");
+        if (callbackUrl) {
+          router.push(callbackUrl);
+        } else {
+          router.push("/");
+        }
+      }
     } catch (error) {
       console.error(error);
       toast.error((error as Error).message);
     }
   };
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const url = new URLSearchParams(window.location.search);
+      const callback = url.get("callbackUrl");
+      setCallbackUrl(callback);
+    }
+  }, []);
   return (
     <>
       <section className="bg-gray-50">

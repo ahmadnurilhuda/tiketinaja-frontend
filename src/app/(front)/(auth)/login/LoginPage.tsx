@@ -5,12 +5,13 @@ import * as Yup from "yup";
 import { Mail, Lock, Ticket } from "lucide-react";
 import { toast } from "react-toastify";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import {useRouter } from "next/navigation";
 
 function LoginPage() {
   const [callbackUrl, setCallbackUrl] = useState<string | null>(null);
   const router = useRouter();
+  const { data: session } = useSession();
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .trim()
@@ -42,11 +43,14 @@ function LoginPage() {
       }
       if (response?.status === 200) {
         toast.success("Login successful");
+        console.log(session?.user);
         if (callbackUrl) {
           router.push(callbackUrl);
-        } else {
-          router.push("/");
         }
+        if(session?.user.role === "ADMIN") {
+          router.push("/admin");
+        }
+        router.push("/");
       }
     } catch (error) {
       console.error(error);

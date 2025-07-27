@@ -6,6 +6,8 @@ import { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import React from "react";
 import { ToastContainer } from "react-toastify";
+import EventCategoryProvider from "./EventCategoryProvider";
+import RegionalProvider from "./RegionalProvider";
 
 export interface ClientProviderProps {
   children: React.ReactNode;
@@ -16,24 +18,26 @@ function ClientProvider({ children, session }: ClientProviderProps) {
   const queryClient = new QueryClient();
   return (
     <>
-    <SessionProvider session={session}>
-      <QueryClientProvider client={queryClient}>
-        <ToastContainer
-          position="top-center" 
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
-        {children}
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
-    </SessionProvider>
+      <SessionProvider session={session}>
+        <QueryClientProvider client={queryClient}>
+          <ToastContainer
+            position="top-center"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          />
+          <RegionalProvider>
+            <EventCategoryProvider>{children}</EventCategoryProvider>
+          </RegionalProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </SessionProvider>
     </>
   );
 }

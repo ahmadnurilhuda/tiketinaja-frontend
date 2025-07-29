@@ -4,12 +4,27 @@ import Image from "next/image";
 import React from "react";
 import { Calendar, MapPin, Ticket, Video, Edit } from "lucide-react";
 import Link from "next/link";
+import OrganizerTicketType from "../../(ticket-types)/OrganizerTicketType";
+import {
+  createTicketType,
+  updateTicketType,
+} from "../../(ticket-types)/TicketTypeActions";
+import { toast } from "react-toastify";
+import { useQueryClient } from "@tanstack/react-query";
+import { TicketType, TicketTypeRequest, } from "@/types/TicketType";
+import TicketTypeForm from "../../components/TicketTypeForm";
 
 interface OrganizerDetailEventProps {
   initialData?: Event;
 }
 
-function OrganizerDetailEvent({ initialData: event }: OrganizerDetailEventProps) {
+function OrganizerDetailEvent({
+  initialData: event,
+}: OrganizerDetailEventProps) {
+  const [editingTicketType, setEditingTicketType] =
+    React.useState<TicketType | null>(null);
+  const queryClient = useQueryClient();
+
   if (!event) {
     return (
       <main className="p-8 text-center">
@@ -19,11 +34,12 @@ function OrganizerDetailEvent({ initialData: event }: OrganizerDetailEventProps)
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
-  const posterImageUrl = event.posterUrl ? `${baseUrl}${event.posterUrl}` : null;
-  const venueLayoutImageUrl = event.venueLayoutUrl ? `${baseUrl}${event.venueLayoutUrl}` : null;
-  
-  console.log("URL Poster Lengkap:", posterImageUrl);
-  console.log("URL Layout Lengkap:", venueLayoutImageUrl);
+  const posterImageUrl = event.posterUrl
+    ? `${baseUrl}${event.posterUrl}`
+    : null;
+  const venueLayoutImageUrl = event.venueLayoutUrl
+    ? `${baseUrl}${event.venueLayoutUrl}`
+    : null;
 
   const formatDate = (dateString: string) => {
     return new Intl.DateTimeFormat("id-ID", {
@@ -32,10 +48,30 @@ function OrganizerDetailEvent({ initialData: event }: OrganizerDetailEventProps)
     }).format(new Date(dateString));
   };
 
+  const handleFormSubmit = async (values: TicketTypeRequest) => {
+    console.log(`Form submitted with values: ${JSON.stringify(values, null, 2)}`);
+    try {
+      let result;
+      if (editingTicketType) {
+        result = await updateTicketType(editingTicketType.id, event.id, values);
+      } else {
+        result = await createTicketType(event.id, values);
+      }
+      if (result.success) {
+        toast.success(result.message);
+        setEditingTicketType(null);
+        queryClient.invalidateQueries({ queryKey: ["ticketTypes", event.id] });
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      toast.error("Terjadi kesalahan yang tidak diketahui.");
+    }
+  };
+
   return (
     <main className="bg-gray-50 p-4 sm:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header: Judul Event dan Tombol Edit */}
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-4xl font-bold text-gray-900">{event.title}</h1>
@@ -46,26 +82,27 @@ function OrganizerDetailEvent({ initialData: event }: OrganizerDetailEventProps)
               </span>
             </p>
           </div>
-          <Link href={`/organizer/event/update/${event.id}`} className="flex cursor-pointer items-center gap-2 bg-white text-gray-700 font-semibold px-4 py-2 rounded-lg hover:bg-gray-100 border shadow-sm transition-colors">
+          <Link
+            href={`/organizer/event/update/${event.id}`}
+            className="flex cursor-pointer items-center gap-2 bg-white text-gray-700 font-semibold px-4 py-2 rounded-lg hover:bg-gray-100 border shadow-sm transition-colors"
+          >
             <Edit size={16} />
             <span>Edit Event</span>
           </Link>
         </div>
-
-        {/* Konten Utama: Poster dan Detail Penting */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Kolom Kiri: Poster Event */}
           <div className="lg:col-span-1">
             {posterImageUrl ? (
               <div className="relative w-full h-[533px] rounded-lg overflow-hidden shadow-lg">
-                 <Image
-                    src={posterImageUrl}
-                    alt={`Poster ${event.title}`}
-                    layout="fill" 
-                    objectFit="cover"
-                    className="bg-gray-200"
-                    priority 
-                  />
+                <Image
+                  src={posterImageUrl}
+                  alt={`Poster ${event.title}`}
+                  layout="fill"
+                  objectFit="cover"
+                  className="bg-gray-200"
+                  priority
+                />
               </div>
             ) : (
               // Fallback jika gambar tidak ada, ukurannya disamakan.
@@ -84,7 +121,9 @@ function OrganizerDetailEvent({ initialData: event }: OrganizerDetailEventProps)
               <div className="flex items-start gap-4">
                 <Calendar className="w-6 h-6 text-blue-500 mt-1" />
                 <div>
-                  <h3 className="font-semibold text-gray-700">Tanggal dan Waktu</h3>
+                  <h3 className="font-semibold text-gray-700">
+                    Tanggal dan Waktu
+                  </h3>
                   <p className="text-gray-600">{formatDate(event.startDate)}</p>
                   <p className="text-gray-500 text-sm">sampai</p>
                   <p className="text-gray-600">{formatDate(event.endDate)}</p>
@@ -112,15 +151,15 @@ function OrganizerDetailEvent({ initialData: event }: OrganizerDetailEventProps)
                   <Video className="w-6 h-6 text-green-500 mt-1" />
                   <div>
                     <h3 className="font-semibold text-gray-700">Tipe Event</h3>
-                    <p className="text-gray-600">Event ini diselenggarakan secara online.</p>
+                    <p className="text-gray-600">
+                      Event ini diselenggarakan secara online.
+                    </p>
                   </div>
                 </div>
               )}
             </div>
           </div>
         </div>
-
-        {/* Deskripsi dan Syarat & Ketentuan */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="prose max-w-none">
             <h2 className="text-2xl font-bold text-gray-800">Deskripsi</h2>
@@ -135,8 +174,6 @@ function OrganizerDetailEvent({ initialData: event }: OrganizerDetailEventProps)
             )}
           </div>
         </div>
-
-        {/* Layout Venue (jika ada) */}
         {venueLayoutImageUrl && (
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
@@ -152,28 +189,31 @@ function OrganizerDetailEvent({ initialData: event }: OrganizerDetailEventProps)
             </div>
           </div>
         )}
-
-        {/* --- Bagian Manajemen Tiket --- */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* DIV KOSONG 1: Untuk menampilkan daftar jenis tiket */}
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              Jenis Tiket
-            </h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-gray-800">
+                Daftar Jenis Tiket
+              </h2>
+            </div>
             <div id="ticket-type-list" className="space-y-4">
-              <p className="text-gray-500 text-center py-8">
-                Belum ada jenis tiket yang ditambahkan.
-              </p>
+              <OrganizerTicketType
+                eventId={event.id}
+                onEdit={(ticketType: TicketType) =>
+                  setEditingTicketType(ticketType)
+                }
+              />
             </div>
           </div>
-
-          {/* DIV KOSONG 2: Untuk form tambah jenis tiket */}
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               Tambah Jenis Tiket Baru
             </h2>
             <div id="ticket-type-form">
-              {/* Komponen form untuk menambah tiket akan dirender di sini */}
+              <TicketTypeForm
+                onFormSubmit={handleFormSubmit}
+                initialData={editingTicketType ?? undefined}
+              />
             </div>
           </div>
         </div>

@@ -16,7 +16,6 @@ repository.interceptors.request.use(
         return config;
       }
       if (!config.headers.Authorization) {
-        console.log(`ini access token di axiox config client ${access_token}`)
         config.headers["Authorization"] = `Bearer ${access_token}`;
       }
     }

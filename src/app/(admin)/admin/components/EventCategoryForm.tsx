@@ -44,14 +44,13 @@ function EventCategoryForm({
       try {
         console.log("Form submitted with values:", values);
         formikHelpers.setSubmitting(true);
-        toast.success(
-          initialData
-            ? "Kategori berhasil diperbarui!"
-            : "Kategori berhasil ditambahkan!"
-        );
-
         if (onFormSubmit) {
           onFormSubmit(values);
+        }
+        if (initialData) {
+          toast.success("Kategori event berhasil diperbarui.");
+        } else {
+          toast.success("Kategori event berhasil dibuat.");
         }
         formikHelpers.resetForm();
       } catch (error) {

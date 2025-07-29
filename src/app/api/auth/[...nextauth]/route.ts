@@ -23,44 +23,40 @@ const handler = NextAuth({
         };
         console.log("Email:", email);
         console.log("Password:", password);
-        try {
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`,
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`,
+          {
+            method: "POST",
+            body: JSON.stringify({ email, password }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const body = await response.json();
+        console.log("\n\n\nResponse:", body);
+        if (!response.ok) {
+          throw new Error(body.message);
+        }
+        const token = body.data;
+        if (token) {
+          const userDataResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/profile`,
             {
-              method: "POST",
-              body: JSON.stringify({ email, password }),
+              method: "GET",
               headers: {
-                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
               },
             }
           );
-          const body = await response.json();
-          console.log("\n\n\nResponse:", body);
-          if (!response.ok) {
-            throw new Error(body.message);
-          }
-          const token = body.data;
-          if (token) {
-            const userDataResponse = await fetch(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/profile`,
-                {
-                  method: "GET",
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                  },
-                }
-              );
-              
-              const user = await userDataResponse.json();
-              return {
-                ...user.data,
-                accessToken: token,
-              };
-          }
-        } catch (error) {
-          console.error("Error during authorization:", error);
-          return null;
+
+          const user = await userDataResponse.json();
+          return {
+            ...user.data,
+            accessToken: token,
+          };
         }
+        return null;
       },
     }),
   ],
@@ -75,8 +71,23 @@ const handler = NextAuth({
         token.role = user.role;
         token.verified = user.verified;
         token.organizer = user.organizer;
+        return token;
       }
       // console.log("JWT Callback - Token:", token);
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/profile`, {
+          headers: {
+            Authorization: `Bearer ${token.accessToken}`,
+          },
+        });
+        if (response.status !== 200) {
+          throw new Error("Failed to refresh token data");
+        }
+        const profile = await response.json();
+        token.organizer = profile.data.organizer;
+      } catch (error) {
+        console.error("Error refreshing JWT:", error);
+      }
       return token;
     },
     async session({ session, token }) {

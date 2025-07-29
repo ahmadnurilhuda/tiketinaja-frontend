@@ -3,11 +3,11 @@ import React, { PropsWithChildren } from "react";
 import repository from "../config/AxiosClientConfig";
 
 const EventCategoryContext = React.createContext({
-    eventCategory: [],
+    eventCategories: [],
 });
 
 function EventCategoryProvider({ children }: PropsWithChildren) {
-  const [eventCategory, setEventCategory] = React.useState([]);
+  const [eventCategories, setEventCategory] = React.useState([]);
 
   const getEventCategory = async () => {
     try {
@@ -32,7 +32,7 @@ function EventCategoryProvider({ children }: PropsWithChildren) {
   }, []);
 
   return (
-    <EventCategoryContext.Provider value={{ eventCategory }}>
+    <EventCategoryContext.Provider value={{eventCategories}}>
       {children}
     </EventCategoryContext.Provider>
   );

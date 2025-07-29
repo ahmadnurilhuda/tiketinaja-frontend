@@ -1,6 +1,6 @@
 "use client";
 import React, { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   useReactTable,
   getCoreRowModel,
@@ -18,6 +18,7 @@ import {
   LocationEdit,
   Calendar,
   Clock,
+  Eye,
 } from "lucide-react";
 import repository from "@/app/config/AxiosClientConfig";
 import { useRegional } from "@/app/context/RegionalProvider";
@@ -27,6 +28,9 @@ import { City } from "@/types/City";
 import type { CellContext, PaginationState } from "@tanstack/react-table";
 import { Category } from "@/types/EventCategory";
 import { useEventCategory } from "@/app/context/EventCategoryProvider";
+import Link from "next/link";
+import { deleteEvent } from "./EventActions";
+import { toast } from "react-toastify";
 
 // Komponen untuk UI saat loading
 const LoadingSkeleton = () => (
@@ -40,7 +44,7 @@ const LoadingSkeleton = () => (
 export default function OrganizerEvent() {
   // Mengambil data provinsi & kota dari context
   const { provinces, cities } = useRegional();
-  const { eventCategory } = useEventCategory();
+  const { eventCategories } = useEventCategory();
 
   // State untuk filter dan paginasi
   const [filter, setFilter] = useState({
@@ -90,6 +94,26 @@ export default function OrganizerEvent() {
       }
     },
   });
+
+  const queryClient = useQueryClient();
+  const deleteMutation = useMutation({
+      mutationFn: deleteEvent, 
+      onSuccess: (data) => {
+        if (data.success) {
+          toast.success(data.message);
+          queryClient.invalidateQueries({ queryKey: ['organizer-events'] });
+        } else {
+          toast.error(data.message);
+        }
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    });
+
+  const handleDelete = async (id: string)=>{
+    deleteMutation.mutate(id);
+  }
 
   //! Fungsi untuk menangani submit filter
   const handleFilterSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -165,10 +189,17 @@ export default function OrganizerEvent() {
         cell: ({ row }: CellContext<Event, unknown>) => (
           <div className="flex items-center gap-2">
             <button className="p-2 text-blue-600 hover:bg-blue-100 rounded-full">
-              <Pencil size={18} />
+              <Link href={`/organizer/event/update/${row.original.id}`}>
+                <Pencil size={18} />
+              </Link>
             </button>
-            <button className="p-2 text-red-600 hover:bg-red-100 rounded-full">
+            <button onClick={() => handleDelete(row.original.id)} className="p-2 text-red-600 hover:bg-red-100 rounded-full">
               <Trash2 size={18} />
+            </button>
+            <button className="p-2 text-green-600 hover:bg-green-100 rounded-full">
+              <Link href={`/organizer/event/${row.original.id}`}>
+                <Eye size={18} />
+              </Link>
             </button>
           </div>
         ),
@@ -201,10 +232,13 @@ export default function OrganizerEvent() {
               Lihat, kelola, dan buat event baru di sini.
             </p>
           </div>
-          <button className="flex items-center gap-2 bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 shadow-sm">
+          <Link
+            href="/organizer/event/create"
+            className="flex items-center gap-2 bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 shadow-sm"
+          >
             <PlusCircle size={20} />
             <span>Buat Event Baru</span>
-          </button>
+          </Link>
         </div>
 
         {/* Form Filter */}
@@ -268,7 +302,7 @@ export default function OrganizerEvent() {
               className="w-full pl-10 pr-3 py-2 rounded-lg bg-white border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             >
               <option value="">Semua Kategori</option>
-              {eventCategory?.map((cat: Category) => (
+              {eventCategories?.map((cat: Category) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
                 </option>

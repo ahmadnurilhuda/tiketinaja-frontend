@@ -35,14 +35,11 @@ export async function deleteEventCategory(id : string) {
     const res = await repository.delete(`/admin/event-categories/delete/${id}`);
     
     if (res.status !== 200) {
-      // Jika gagal, kembalikan pesan error agar bisa ditangkap di client
       return { success: false, message: res.data.message || "Gagal menghapus kategori" };
     }
-    // Jika berhasil, revalidasi path agar data di-refresh
     revalidatePath('/admin/event-categories');
     return { success: true, message: "Kategori berhasil dihapus" };
   } catch (error) {
-    // Tangkap error jaringan atau lainnya
     return { success: false, message: (error as Error).message || "Terjadi kesalahan pada server" };
   }
 

@@ -14,14 +14,14 @@ import repository from "@/app/config/AxiosClientConfig";
 
 function NavbarFront() {
   const { data: session } = useSession();
-  const [isOrganizer, setIsOrganizer] = useState<boolean | null>(null);
+  const [isOrganizer, setIsOrganizer] = useState<boolean>(false);
 
   const pages = [{ name: "My Orders", href: "/orders" }];
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        if (session?.accessToken && isOrganizer === null) {
+        if (session?.accessToken && isOrganizer === false) {
           const response = await repository.get("/auth/profile");
           if (response.status !== 200) {
             throw new Error(response.data.message);
@@ -75,7 +75,7 @@ function NavbarFront() {
                         {session.user.email}
                       </p>
                     </div>
-                    {pages.map((page) => (
+                    {session.user.role === "BUYER" && pages.map((page) => (
                       <MenuItem key={page.name}>
                         <Link
                           href={page.href}
@@ -85,8 +85,7 @@ function NavbarFront() {
                         </Link>
                       </MenuItem>
                     ))}
-
-                    {isOrganizer === false ? (
+                    {isOrganizer === false && session.user.role === "BUYER" ? (
                       <MenuItem>
                         <Link
                           href="/join-organizer"
@@ -95,13 +94,26 @@ function NavbarFront() {
                           Join Organizer
                         </Link>
                       </MenuItem>
-                    ) : (
+                    ) : null}
+
+                    {isOrganizer === true && session.user.role === "BUYER" ? (
                       <MenuItem>
                         <Link
                           href="/organizer"
                           className="block w-full px-4 py-2 text-left text-sm font-semibold text-blue-600 ui-active:bg-gray-100 ui-active:text-blue-700"
                         >
-                          Organizer
+                          Organizer Dashboard
+                        </Link>
+                      </MenuItem>
+                    ) : null}
+
+                    {session.user.role === "ADMIN" && (
+                      <MenuItem>
+                        <Link
+                          href="/admin"
+                          className="block w-full px-4 py-2 text-left text-sm font-semibold text-blue-600 ui-active:bg-gray-100 ui-active:text-blue-700"
+                        >
+                          Admin Dashboard
                         </Link>
                       </MenuItem>
                     )}

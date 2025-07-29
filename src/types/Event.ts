@@ -15,8 +15,29 @@ export type Event = {
     venueLayoutUrl: string;
     venueName: string;
     venueAddress: string;
+    isOnline: boolean;
     city: City;
     eventCategory: Category;
     createdAt: string;
     updatedAt: string;
   };
+
+  export interface EventData {
+    id: string;
+    title: string;
+    slug: string;
+    description: string;
+    requirements: string;
+    venueName: string;
+    venueAddress: string;
+    organizer: Organizer;
+    startDate: string;
+    endDate: string;
+    isOnline: boolean;
+    posterUrl: string;
+    venueLayoutUrl: string;
+    city: City;
+    eventCategory: Category;
+    createdAt: string;
+    updatedAt: string;
+  }

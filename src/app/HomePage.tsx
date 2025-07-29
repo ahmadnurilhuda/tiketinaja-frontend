@@ -5,13 +5,13 @@ import { useEventCategory } from "./context/EventCategoryProvider";
 import { Category } from "@/types/EventCategory";
 
 function HomePage() {
-  const {eventCategory} = useEventCategory();
+  const {eventCategories} = useEventCategory();
   return (
     <>
       <main>
         <NavbarFront />
         <div>HomePage</div>
-        {eventCategory.map((category : Category) => (
+        {eventCategories.map((category : Category) => (
           <div key={category.id}>{category.name}</div>
         ))}
       </main>

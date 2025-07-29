@@ -21,7 +21,6 @@ export const authOptions: NextAuthOptions = {
           email: string;
           password: string;
         };
-        try {
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`,
             {
@@ -51,24 +50,37 @@ export const authOptions: NextAuthOptions = {
               accessToken: token,
             };
           }
-        } catch (error) {
-          console.error("Error during authorization:", error);
           return null;
-        }
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
+     if (user) {
         token.id = user.id;
         token.accessToken = user.accessToken;
         token.fullName = user.fullName;
         token.nickName = user.nickName;
         token.email = user.email;
         token.role = user.role;
-        token.isVerified = user.isVerified;
-        token.isOrganizer = user.isOrganizer;
+        token.verified = user.verified;
+        token.organizer = user.organizer;
+        return token;
+      }
+      // console.log("JWT Callback - Token:", token);
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/profile`, {
+          headers: {
+            Authorization: `Bearer ${token.accessToken}`,
+          },
+        });
+        if (response.status !== 200) {
+          throw new Error("Failed to refresh token data");
+        }
+        const profile = await response.json();
+        token.organizer = profile.data.organizer;
+      } catch (error) {
+        console.error("Error refreshing JWT:", error);
       }
       return token;
     },
@@ -80,9 +92,8 @@ export const authOptions: NextAuthOptions = {
       session.user.fullName = token.fullName as string;
       session.user.nickName = token.nickName as string;
       session.user.role = token.role as string;
-      session.user.isVerified = token.isVerified as boolean;
-      session.user.isOrganizer = token.isOrganizer as boolean;
-      console.log("Session Callback - Session 2:", session);
+      session.user.verified = token.verified as boolean;
+      session.user.organizer = token.organizer as boolean;
       return session;
     },
   },

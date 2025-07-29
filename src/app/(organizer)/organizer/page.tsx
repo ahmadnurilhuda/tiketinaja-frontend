@@ -1,8 +1,11 @@
 import React from 'react'
+import DashboardOrganizer from './components/DashboardOrganizer'
 
 function page() {
   return (
-    <div>page</div>
+    <>
+      <DashboardOrganizer />
+    </>
   )
 }
 

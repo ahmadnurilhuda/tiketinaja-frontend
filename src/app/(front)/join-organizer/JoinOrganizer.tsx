@@ -14,10 +14,14 @@ import {
 import { toast } from "react-toastify";
 import repository from "@/app/config/AxiosClientConfig";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 function JoinOrganizer() {
   const [preview, setPreview] = useState<string | null>(null);
   const router = useRouter();
+  const {data: session, status, update} = useSession();
+
+  const [isReadyToNavigate, setIsReadyToNavigate] = useState(false);
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().trim().required("Name Organizer is required"),
@@ -68,6 +72,14 @@ function JoinOrganizer() {
     };
   }, [preview]);
 
+  useEffect(() => {
+    if (status !== 'authenticated') return;
+    if (isReadyToNavigate && session?.user?.organizer === true) {
+      toast.info("Redirecting to Organizer Dashboard");
+      router.push("/organizer");
+    }
+  }, [session, isReadyToNavigate, router, status]);
+
   const handleSubmit = async (
     values: typeof initialValues,
     formikHelpers: FormikHelpers<typeof initialValues>
@@ -88,13 +100,13 @@ function JoinOrganizer() {
         throw new Error(response.data.message);
       }
       toast.success(response.data.message);
-      resetForm();
-      router.push("/organizer");
+      await update();
+      // resetForm();
+      setIsReadyToNavigate(true);
     } catch (error) {
       console.error(error);
       toast.error((error as Error).message);
     }
-    console.log(values);
     setSubmitting(false);
   };
 
@@ -314,7 +326,7 @@ function JoinOrganizer() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-2.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-2.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500  focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? "Mengirim..." : "Daftar sebagai Organizer"}
                   </button>

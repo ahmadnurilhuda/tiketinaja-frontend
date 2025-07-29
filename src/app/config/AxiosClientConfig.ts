@@ -9,7 +9,6 @@ const repository = axios.create({
 repository.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     const session = await getSession();
-    console.log(`ini session di axiox config clientt ${session}`)
     const access_token = session?.accessToken;
     if (!config.url?.startsWith("/public")) {
       if (!access_token) {
@@ -17,7 +16,7 @@ repository.interceptors.request.use(
         return config;
       }
       if (!config.headers.Authorization) {
-        console.log(`ini access token di axiox config clientt ${access_token}`)
+        console.log(`ini access token di axiox config client ${access_token}`)
         config.headers["Authorization"] = `Bearer ${access_token}`;
       }
     }

@@ -22,6 +22,26 @@ export type Event = {
     updatedAt: string;
   };
 
+  export type PublicEvent = {
+    id: string;
+    title: string;
+    slug: string;
+    description: string;
+    requirements: string;
+    organizerName: string;
+    startDate: string;
+    endDate: string;
+    posterUrl: string;
+    venueLayoutUrl: string;
+    venueName: string;
+    venueAddress: string;
+    isOnline: boolean;
+    city: string;
+    eventCategory: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+
   export interface EventData {
     id: string;
     title: string;

@@ -242,90 +242,89 @@ export default function OrganizerEvent() {
         </div>
 
         {/* Form Filter */}
-        <form
-          key={formKey}
-          onSubmit={handleFilterSubmit}
-          className="mb-6 flex flex-wrap items-center gap-4 p-4 bg-gray-100 rounded-xl border"
-        >
-          {/* Input Judul */}
-          <div className="relative w-full sm:w-64 ">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
-            <input
-              name="title"
-              type="text"
-              placeholder="Cari Event..."
-              defaultValue={filter.title}
-              className="w-full rounded-lg bg-white border border-gray-300 py-2 pl-10 pr-3 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
+      <form
+        key={formKey}
+        onSubmit={handleFilterSubmit}
+        className="mb-6 w-full flex flex-wrap items-center gap-4 p-4 bg-gray-100 rounded-xl border"
+      >
+        {/* Input Judul */}
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+          <input
+            name="title"
+            type="text"
+            placeholder="Cari Event..."
+            defaultValue={filter.title}
+            className="w-full rounded-lg bg-white border border-gray-300 py-2 pl-10 pr-3 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          />
+        </div>
 
-          {/* Filter Provinsi */}
-          <div className="relative w-full sm:w-48">
-            <LocationEdit className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
-            <select
-              name="provinceId"
-              defaultValue={filter.provinceId}
-              className="w-full pl-10 pr-3 py-2 rounded-lg border bg-white border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option value="">Semua Provinsi</option>
-              {provinces?.map((prov: Province) => (
-                <option key={prov.id} value={prov.id}>
-                  {prov.name}
-                </option>
-              ))}
-            </select>
-          </div>
+        {/* Filter Provinsi */}
+        <div className="relative flex-1 min-w-[160px]">
+          <LocationEdit className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+          <select
+            name="provinceId"
+            defaultValue={filter.provinceId}
+            className="w-full pl-10 pr-3 py-2 rounded-lg  bg-white border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          >
+            <option value="">Semua Provinsi</option>
+            {provinces?.map((prov: Province) => (
+              <option key={prov.id} value={prov.id}>
+                {prov.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-          {/* Filter Kota */}
-          <div className="relative w-full sm:w-48">
-            <LocationEdit className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
-            <select
-              name="cityId"
-              defaultValue={filter.cityId}
-              className="w-full pl-10 pr-3 py-2 rounded-lg bg-white border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option value="">Semua Kota</option>
-              {cities?.map((city: City) => (
-                <option key={city.id} value={city.id}>
-                  {city.name}
-                </option>
-              ))}
-            </select>
-          </div>
+        {/* Filter Kota */}
+        <div className="relative flex-1 min-w-[160px]">
+          <LocationEdit className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+          <select
+            name="cityId"
+            defaultValue={filter.cityId}
+            className="w-full pl-10 pr-3 py-2 rounded-lg bg-white border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          >
+            <option value="">Semua Kota</option>
+            {cities?.map((city: City) => (
+              <option key={city.id} value={city.id}>
+                {city.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-          {/* Filter Kategori */}
-          <div className="relative w-full sm:w-48">
-            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
-            <select
-              name="category"
-              defaultValue={filter.eventCategoryId}
-              className="w-full pl-10 pr-3 py-2 rounded-lg bg-white border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option value="">Semua Kategori</option>
-              {eventCategories?.map((cat: Category) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div className="relative flex-1 min-w-[160px]">
+          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+          <select
+            name="category"
+            defaultValue={filter.eventCategoryId}
+            className="w-full pl-10 pr-3 py-2 rounded-lg bg-white border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          >
+            <option value="">Semua Kategori</option>
+            {eventCategories?.map((cat: Category) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-          {/* Filter Sort By */}
-          <div className="relative w-full sm:w-48">
-            <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
-            <select
-              name="sortBy"
-              defaultValue={filter.sortBy}
-              className="w-full pl-10 pr-3 py-2 rounded-lg bg-white border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              {sortByOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div className="relative flex-1 min-w-[160px]">
+          <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+          <select
+            name="sortBy"
+            defaultValue={filter.sortBy}
+            className="w-full pl-10 pr-3 py-2 rounded-lg bg-white border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          >
+            {sortByOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
 
+        <div className="flex gap-3 ml-auto">
           <button
             type="submit"
             className="flex items-center gap-2 bg-blue-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-blue-700 shadow-sm transition-colors"
@@ -341,7 +340,8 @@ export default function OrganizerEvent() {
             <X size={18} />
             <span>Reset</span>
           </button>
-        </form>
+        </div>
+      </form>
 
         {/* Tabel */}
         <div className="overflow-x-auto">

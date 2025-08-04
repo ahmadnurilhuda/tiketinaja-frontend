@@ -84,11 +84,9 @@ function EventForm({ onFormSubmit, initialData }: EventFormProps) {
       "isFileRequired",
       "File poster wajib diunggah",
       function (value) {
-        // `value` adalah file baru yang diunggah (jika ada)
+        const { initialData } = this.options.context || {};
         const hasExistingFile = !!(initialData && initialData.posterUrl);
         const hasNewFile = value instanceof File && value.size > 0;
-
-        // Lolos jika ada file baru ATAU sudah ada file dari data awal.
         return hasNewFile || hasExistingFile;
       }
     ),
@@ -157,7 +155,7 @@ function EventForm({ onFormSubmit, initialData }: EventFormProps) {
     const endDateUTC = new Date(values.endDate).toISOString();
     formData.append("startDate", startDateUTC);
     formData.append("endDate", endDateUTC);
-    formData.append("isOnline", values.isOnline.valueOf().toString());
+    formData.append("online", values.isOnline ? "true" : "false");
     formData.append("cityId", values.cityId);
     formData.append("eventCategoryId", values.eventCategoryId);
     if (values.poster && values.poster.size > 0) {
@@ -199,6 +197,7 @@ function EventForm({ onFormSubmit, initialData }: EventFormProps) {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
+        context={{ initialData }}
         enableReinitialize
       >
         {({ setFieldValue, errors, touched, isValid }) => (
@@ -216,7 +215,7 @@ function EventForm({ onFormSubmit, initialData }: EventFormProps) {
                   <Field
                     name="title"
                     type="text"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="mt-1 block px-4 py-4 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   />
                   <ErrorMessage
                     name="title"
@@ -229,13 +228,13 @@ function EventForm({ onFormSubmit, initialData }: EventFormProps) {
                     htmlFor="description"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Deskripsi
+                    Deskripsi (Wajib)
                   </label>
                   <Field
                     name="description"
                     as="textarea"
                     rows="5"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="mt-1 block w-full px-4 py-4 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   />
                   <ErrorMessage
                     name="description"
@@ -248,13 +247,13 @@ function EventForm({ onFormSubmit, initialData }: EventFormProps) {
                     htmlFor="requirements"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Syarat & Ketentuan (Opsional)
+                    Syarat & Ketentuan (Wajib)
                   </label>
                   <Field
                     name="requirements"
                     as="textarea"
                     rows="3"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="mt-1 block w-full px-4 py-4 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   />
                   <ErrorMessage
                     name="requirements"
@@ -263,18 +262,22 @@ function EventForm({ onFormSubmit, initialData }: EventFormProps) {
                   />
                 </div>
                 <div className="flex items-center gap-4">
-                  <Field
-                    type="checkbox"
-                    name="isOnline"
-                    id="isOnline"
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
                   <label
                     htmlFor="isOnline"
                     className="text-sm font-medium text-gray-700"
                   >
-                    Event ini diadakan secara online
+                    Jenis Event
                   </label>
+                  <Field
+                    as="select"
+                    name="isOnline"
+                    id="isOnline"
+                    className="rounded px-4 py-2 border border-gray-300 text-gray-700 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">Pilih jenis event</option>
+                    <option value="true">Online</option>
+                    <option value="false">Offline</option>
+                  </Field>
                 </div>
               </div>
 
@@ -291,7 +294,7 @@ function EventForm({ onFormSubmit, initialData }: EventFormProps) {
                     <Field
                       name="startDate"
                       type="datetime-local"
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      className="mt-1 block w-full px-4 py-4 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     />
                     <ErrorMessage
                       name="startDate"
@@ -309,7 +312,7 @@ function EventForm({ onFormSubmit, initialData }: EventFormProps) {
                     <Field
                       name="endDate"
                       type="datetime-local"
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      className="mt-1 block w-full px-4 py-4 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     />
                     <ErrorMessage
                       name="endDate"
@@ -328,7 +331,7 @@ function EventForm({ onFormSubmit, initialData }: EventFormProps) {
                   <Field
                     name="venueName"
                     type="text"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="mt-1 block w-full px-4 py-4 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   />
                   <ErrorMessage
                     name="venueName"
@@ -347,7 +350,7 @@ function EventForm({ onFormSubmit, initialData }: EventFormProps) {
                     name="venueAddress"
                     as="textarea"
                     rows="2"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="mt-1 block w-full px-4 py-4 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   />
                   <ErrorMessage
                     name="venueAddress"
@@ -366,7 +369,7 @@ function EventForm({ onFormSubmit, initialData }: EventFormProps) {
                     <Field
                       as="select"
                       name="eventCategoryId"
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      className="mt-1 block w-full px-4 py-4 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     >
                       <option value="">Pilih Kategori</option>
                       {eventCategories.map((cat: Category) => (
@@ -391,7 +394,7 @@ function EventForm({ onFormSubmit, initialData }: EventFormProps) {
                     <Field
                       as="select"
                       name="cityId"
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      className="mt-1 block w-full px-4 py-4 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     >
                       <option value="">Pilih Kota</option>
                       {cities.map((city: City) => (
@@ -513,33 +516,6 @@ function EventForm({ onFormSubmit, initialData }: EventFormProps) {
                   </label>
                 </div>
               </div>
-            </div>
-
-            <div
-              style={{
-                background: "#f0f0f0",
-                padding: "1rem",
-                marginTop: "2rem",
-                borderRadius: "8px",
-                border: "1px solid #ccc",
-              }}
-            >
-              <h3 style={{ marginTop: 0, fontWeight: "bold" }}>
-                Formik Debug State
-              </h3>
-              <p>
-                <strong>Form Valid?</strong> {isValid.toString()}
-              </p>
-              <pre
-                style={{
-                  whiteSpace: "pre-wrap",
-                  wordWrap: "break-word",
-                  background: "#fff",
-                  padding: "0.5rem",
-                }}
-              >
-                <strong>Errors:</strong> {JSON.stringify(errors, null, 2)}
-              </pre>
             </div>
 
             {/* Tombol Submit */}

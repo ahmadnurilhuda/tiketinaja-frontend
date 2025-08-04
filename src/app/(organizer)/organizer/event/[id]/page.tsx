@@ -3,8 +3,6 @@ import OrganizerDetailEvent from './OrganizerDetailEvent'
 import { getEvent } from '../EventActions';
 
 
-
-
 async function page({ params }: { params: { id: string } }) {
   const { id } = params;
   const data = await getEvent(id);

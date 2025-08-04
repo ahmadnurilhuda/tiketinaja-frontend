@@ -65,6 +65,7 @@ function OrganizerDetailEvent({
         toast.error(result.message);
       }
     } catch (error) {
+      console.log(error)
       toast.error("Terjadi kesalahan yang tidak diketahui.");
     }
   };

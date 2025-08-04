@@ -21,18 +21,22 @@ function NavbarFront() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        if (session?.accessToken && isOrganizer === false) {
+        if (session?.accessToken) {
           const response = await repository.get("/auth/profile");
+          console.log("Respons Profile API:", response.data);
+
           if (response.status !== 200) {
             throw new Error(response.data.message);
           }
-          setIsOrganizer(response.data.data.organizer);
+          const profileData = response.data.data;
+          if (profileData && typeof profileData.organizer === "boolean") {
+            setIsOrganizer(profileData.organizer);
+          }
         }
       } catch (error) {
-        console.error(error);
+        console.error("Gagal mengambil profil:", error);
       }
     };
-
     fetchProfile();
   }, [session, isOrganizer]);
 
@@ -45,6 +49,12 @@ function NavbarFront() {
           </Link>
         </div>
         <div className="flex items-center gap-x-4">
+          <Link
+            href="/event"
+            className="rounded-md bg-white px-3.5 py-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          >
+            Events
+          </Link>
           {session?.user ? (
             <Menu as="div" className="relative inline-block text-left">
               <div>
@@ -75,16 +85,17 @@ function NavbarFront() {
                         {session.user.email}
                       </p>
                     </div>
-                    {session.user.role === "BUYER" && pages.map((page) => (
-                      <MenuItem key={page.name}>
-                        <Link
-                          href={page.href}
-                          className="block px-4 py-2 text-sm text-gray-700 ui-active:bg-gray-100"
-                        >
-                          {page.name}
-                        </Link>
-                      </MenuItem>
-                    ))}
+                    {session.user.role === "BUYER" &&
+                      pages.map((page) => (
+                        <MenuItem key={page.name}>
+                          <Link
+                            href={page.href}
+                            className="block px-4 py-2 text-sm text-gray-700 ui-active:bg-gray-100"
+                          >
+                            {page.name}
+                          </Link>
+                        </MenuItem>
+                      ))}
                     {isOrganizer === false && session.user.role === "BUYER" ? (
                       <MenuItem>
                         <Link

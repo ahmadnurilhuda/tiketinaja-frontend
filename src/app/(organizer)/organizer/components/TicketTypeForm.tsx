@@ -22,7 +22,6 @@ const validationSchema = Yup.object().shape({
     .required("Harga wajib diisi"),
   startDate: Yup.date()
     .required('Tanggal mulai penjualan wajib diisi')
-    // Tambahkan validasi .min() untuk memastikan tanggalnya hari ini atau di masa depan
     .min(new Date(), 'Tanggal mulai tidak boleh di masa lalu'),
   endDate: Yup.date()
     .required('Tanggal akhir penjualan wajib diisi')

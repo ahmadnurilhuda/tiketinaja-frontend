@@ -10,12 +10,10 @@ const nextConfig: NextConfig = {
         port: '9988',
         pathname: '/uploads/**',
       },
-      // {
-      //   protocol: 'https',
-      //   hostname: '1e12217678df.ngrok-free.app',
-      //   port: '',
-      //   pathname: '/**',
-      // },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
     ],
   },
   serverActions: {

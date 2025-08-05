@@ -69,9 +69,6 @@ function PublicEventDetailCheckout({ event }: { event: PublicEvent }) {
     },
     enabled: !!event.id,
   });
-
-  console.log(ticketTypes);
-
   const getSaleStatus = (start: string, end: string) => {
     const now = new Date();
     if (now < new Date(start)) return { text: "Segera Hadir", active: false };
@@ -137,9 +134,9 @@ function PublicEventDetailCheckout({ event }: { event: PublicEvent }) {
       if (res.status !== 200) {
         throw new Error(res.data.message || "Gagal melakukan checkout");
       }
-      toast.success("Checkout berhasil!");
       const data =  await res.data.data;
       if(data?.paymentUrl){
+        toast.success("Checkout berhasil! Silakan melakukan pembayaran.");
         window.open(data.paymentUrl, "_blank");
       }
       setSelectedQuantities({});

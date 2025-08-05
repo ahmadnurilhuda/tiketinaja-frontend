@@ -18,16 +18,16 @@ const getEvent = async (slug: string) : Promise<PublicEvent> => {
     }
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const { slug } = params; 
+export async function generateMetadata({ params }: { params: Promise < { slug: string }> }) {
+  const { slug } = await params; 
   const event = await getEvent(slug);
   return {
     title: event ? `${event.title}` : "Event",
   };
 }
 
-async function page({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+async function page({ params }: { params: Promise <{ slug: string }> }) {
+  const { slug } = await params;
   const event = await getEvent(slug);
   return (
     <>

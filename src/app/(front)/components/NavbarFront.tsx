@@ -16,7 +16,7 @@ function NavbarFront() {
   const { data: session } = useSession();
   const [isOrganizer, setIsOrganizer] = useState<boolean>(false);
 
-  const pages = [{ name: "My Orders", href: "/orders" }];
+  const pages = [{ name: "My Orders", href: "/order" }, {name: "My Tickets", href:"/ticket"}];
 
   useEffect(() => {
     const fetchProfile = async () => {

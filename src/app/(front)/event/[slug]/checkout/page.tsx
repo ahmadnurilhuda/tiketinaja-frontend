@@ -17,8 +17,8 @@ const getEvent = async (slug: string) => {
   }
 };
 
-async function page({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+async function page({ params }: { params: Promise < { slug: string } >}) {
+  const { slug } = await params;
   const event = await getEvent(slug);
   return(
     <>

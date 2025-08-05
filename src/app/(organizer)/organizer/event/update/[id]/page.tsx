@@ -2,16 +2,16 @@ import React from "react";
 import EventForm from "../../../components/EventForm";
 import { getEvent, updateEvent } from "../../EventActions";
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
-  const { id } = params; 
+export async function generateMetadata({ params }: { params: Promise< { id: string }> }) {
+  const { id } = await params; 
   const event = await getEvent(id);
   return {
     title: event ? `Edit Event: ${event.title}` : "Edit Event",
   };
 }
 
-async function page({ params }: { params: { id: string } }) {
-  const { id } = params;
+async function page({ params }: { params: Promise< { id: string }> }) {
+  const { id } = await params;
   const data = await getEvent(id);
   if (!data) {
     return <div>Event tidak ditemukan atau gagal dimuat.</div>;

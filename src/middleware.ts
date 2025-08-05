@@ -1,7 +1,7 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
-const AuthPaths = ["/cart", "/orders", "/checkout"];
+const AuthPaths = ["/order","/ticket","/checkout"];
 
 export default withAuth(
   function middleware(req) {
@@ -14,7 +14,6 @@ export default withAuth(
         return NextResponse.redirect(new URL("/", req.url));
       }
     }
-
     
     if (req.nextUrl.pathname.startsWith("/join-organizer")) {
       const token = req.nextauth.token;
@@ -54,7 +53,7 @@ export default withAuth(
       }
     }
 
-    if (AuthPaths.includes(req.nextUrl.pathname)) {
+    if (AuthPaths.some((path) => req.nextUrl.pathname.includes(path))) {
       const token = req.nextauth.token;
       if (!token) {
         return NextResponse.redirect(

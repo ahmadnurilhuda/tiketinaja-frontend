@@ -4,7 +4,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   useReactTable,
   getCoreRowModel,
-  getPaginationRowModel,
   flexRender,
 } from "@tanstack/react-table";
 import {
@@ -128,7 +127,7 @@ export default function OrganizerEvent() {
       eventCategoryId: formData.get("eventCategoryId") as string,
     };
     setFilter(newFilter);
-    setPagination((prev) => ({ ...prev, pageIndex: 0 })); // Reset ke halaman pertama
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
 
   const [formKey, setFormKey] = useState(0);
@@ -296,7 +295,7 @@ export default function OrganizerEvent() {
         <div className="relative flex-1 min-w-[160px]">
           <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
           <select
-            name="category"
+            name="eventCategoryId"
             defaultValue={filter.eventCategoryId}
             className="w-full pl-10 pr-3 py-2 rounded-lg bg-white border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
